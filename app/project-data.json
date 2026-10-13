@@ -1,0 +1,52 @@
+{
+  "projects": [
+    {
+      "name": "Contributor Onboarding Refresh",
+      "owner": "Maya Chen",
+      "status": "Active",
+      "recentActivity": "Published a draft setup guide; looking for a first-time contributor to test it.",
+      "priority": "High",
+      "summary": "Make the first contribution easier with clearer setup steps and a small good-first-issue queue."
+    },
+    {
+      "name": "API Pagination Improvements",
+      "owner": "Rafael Costa",
+      "status": "In progress",
+      "recentActivity": "Cursor pagination proposal is ready for review; feedback is welcome on backward compatibility.",
+      "priority": "Medium",
+      "summary": "Add predictable pagination so integrations can handle large result sets reliably."
+    },
+    {
+      "name": "Build Pipeline Reliability",
+      "owner": "Priya Nair",
+      "status": "At risk",
+      "recentActivity": "Investigating intermittent Linux test failures; a reproducible CI log would help.",
+      "priority": "High",
+      "summary": "Reduce flaky checks and make CI failures easier for maintainers to diagnose."
+    },
+    {
+      "name": "Accessibility Audit",
+      "owner": "Jordan Lee",
+      "status": "Planning",
+      "recentActivity": "Collected keyboard-navigation feedback and is preparing the first set of fixes.",
+      "priority": "Medium",
+      "summary": "Address keyboard and screen-reader barriers across the core contributor workflows."
+    },
+    {
+      "name": "Python SDK Examples",
+      "owner": "Alex Morgan",
+      "status": "Active",
+      "recentActivity": "Merged an authentication example; next up is a tested retry and error-handling guide.",
+      "priority": "Low",
+      "summary": "Give users copyable, tested examples for common SDK tasks and error cases."
+    },
+    {
+      "name": "Release Notes Automation",
+      "owner": "Samira Patel",
+      "status": "Complete",
+      "recentActivity": "The changelog generator shipped this week; maintainers are welcome to report rough edges.",
+      "priority": "Low",
+      "summary": "Help release contributors assemble accurate notes from merged pull requests."
+    }
+  ]
+}

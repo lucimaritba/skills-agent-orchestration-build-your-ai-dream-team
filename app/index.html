@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f5ef">
+    <title>Project Pulse</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to projects</a>
+
+    <header class="topbar">
+      <a class="wordmark" href="#main-content" aria-label="Project Pulse home">
+        <span class="wordmark-mark" aria-hidden="true">P</span>
+        <span>MONA <span class="wordmark-divider">/</span> TEAM</span>
+      </a>
+      <p class="topbar-note"><span class="live-dot" aria-hidden="true"></span> Team workspace</p>
+    </header>
+
+    <main id="main-content" class="dashboard" tabindex="-1">
+      <section class="dashboard-intro" aria-labelledby="page-title">
+        <div class="intro-copy">
+          <p class="eyebrow">A clear view of what moves us</p>
+          <h1 id="page-title">Project Pulse<span class="title-period">.</span></h1>
+          <p class="intro-description">The latest from across Mona's projects, all in one place.</p>
+        </div>
+        <div class="snapshot" aria-label="Project overview">
+          <div class="snapshot-item">
+            <span class="snapshot-value" id="project-count">—</span>
+            <span class="snapshot-label">Projects</span>
+          </div>
+          <div class="snapshot-item snapshot-item-active">
+            <span class="snapshot-value" id="active-count">—</span>
+            <span class="snapshot-label">In motion</span>
+          </div>
+          <div class="snapshot-item">
+            <span class="snapshot-value" id="priority-count">—</span>
+            <span class="snapshot-label">High priority</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="projects-section" aria-labelledby="projects-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Across the team</p>
+            <h2 id="projects-heading">Projects</h2>
+          </div>
+          <p class="section-caption" id="results-caption">A live snapshot of recent work</p>
+        </div>
+
+        <div id="project-state" class="state-panel" role="status" aria-live="polite" aria-atomic="true">
+          <span class="loading-mark" aria-hidden="true"></span>
+          <span>Loading projects</span>
+        </div>
+        <div id="project-list" class="project-grid" aria-labelledby="projects-heading" hidden></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span class="footer-mark" aria-hidden="true">M.</span>
+      <span>Made for the people moving projects forward.</span>
+      <span class="footer-rule" aria-hidden="true"></span>
+    </footer>
+
+    <script>
+      const projectList = document.querySelector("#project-list");
+      const projectState = document.querySelector("#project-state");
+      const projectCount = document.querySelector("#project-count");
+      const activeCount = document.querySelector("#active-count");
+      const priorityCount = document.querySelector("#priority-count");
+      const resultsCaption = document.querySelector("#results-caption");
+
+      const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (character) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[character]);
+
+      const classToken = (value) => String(value ?? "unknown")
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "") || "unknown";
+
+      const formatLabel = (value) => String(value ?? "Unknown")
+        .replace(/[-_]+/g, " ")
+        .replace(/\b\w/g, (letter) => letter.toUpperCase());
+
+      const showState = (message, type = "loading") => {
+        projectState.className = `state-panel state-${type}`;
+        projectState.setAttribute("role", type === "error" ? "alert" : "status");
+        projectState.innerHTML = type === "loading"
+          ? `<span class="loading-mark" aria-hidden="true"></span><span>${escapeHtml(message)}</span>`
+          : `<span class="state-symbol" aria-hidden="true">${type === "empty" ? "0" : "!"}</span><span>${escapeHtml(message)}</span>`;
+        projectState.hidden = false;
+        projectList.hidden = true;
+      };
+
+      const renderProjects = (projects) => {
+        projectCount.textContent = String(projects.length).padStart(2, "0");
+        activeCount.textContent = String(projects.filter(({ status }) =>
+          ["active", "in progress", "in-progress", "on track"].includes(String(status).toLowerCase())
+        ).length).padStart(2, "0");
+        priorityCount.textContent = String(projects.filter(({ priority }) =>
+          ["high", "critical", "urgent"].includes(String(priority).toLowerCase())
+        ).length).padStart(2, "0");
+
+        if (projects.length === 0) {
+          resultsCaption.textContent = "Nothing on the board just yet";
+          showState("No projects to show yet. Check back when the team adds its first project.", "empty");
+          return;
+        }
+
+        projectList.innerHTML = projects.map((project, index) => {
+          const status = project.status ?? "Unknown";
+          const priority = project.priority ?? "Unknown";
+          return `
+            <article class="project-card" style="--card-index: ${index}" aria-labelledby="project-title-${index}">
+              <div class="card-topline">
+                <span class="card-index">${String(index + 1).padStart(2, "0")}</span>
+                <span class="status-badge status-${classToken(status)}">
+                  <span class="badge-dot" aria-hidden="true"></span>${escapeHtml(formatLabel(status))}
+                </span>
+              </div>
+              <h3 id="project-title-${index}">${escapeHtml(project.name || "Untitled project")}</h3>
+              <p class="project-owner"><span class="owner-label">Owner</span>${escapeHtml(project.owner || "Unassigned")}</p>
+              <p class="summary-copy">${escapeHtml(project.summary || "")}</p>
+              <div class="activity-block">
+                <p class="field-label">Recent activity</p>
+                <p class="activity-copy">${escapeHtml(project.recentActivity || "No recent activity reported.")}</p>
+              </div>
+              <div class="card-bottomline">
+                <span class="field-label">Priority</span>
+                <span class="priority-badge priority-${classToken(priority)}">${escapeHtml(formatLabel(priority))}</span>
+              </div>
+            </article>`;
+        }).join("");
+
+        resultsCaption.textContent = `${projects.length} ${projects.length === 1 ? "project" : "projects"} in view`;
+        projectState.hidden = true;
+        projectList.hidden = false;
+      };
+
+      fetch("project-data.json")
+        .then((response) => {
+          if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
+          return response.json();
+        })
+        .then((data) => {
+          if (!data || !Array.isArray(data.projects)) throw new Error("Project data must include a projects array");
+          renderProjects(data.projects);
+        })
+        .catch(() => {
+          projectCount.textContent = "—";
+          activeCount.textContent = "—";
+          priorityCount.textContent = "—";
+          resultsCaption.textContent = "Project data is unavailable";
+          showState("We couldn't load the project list. Please try again later.", "error");
+        });
+    </script>
+  </body>
+</html>
